@@ -10,6 +10,7 @@ model_selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation()
 st.title("OpenCV")
 st.subheader("Image Operations")
 st.write("various operations with opencv")
+st.write("Created by vishwajeet jagtap")
 
 
 add_selectbox = st.sidebar.selectbox(
