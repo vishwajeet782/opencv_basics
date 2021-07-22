@@ -1,3 +1,4 @@
 streamlit
-opencv-contrib-python-headless
+opencv-contrib-python
 mediapipe
+opencv-python
