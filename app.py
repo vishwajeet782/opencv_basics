@@ -6,6 +6,9 @@ import mediapipe as mp
 mp_drawing = mp.solutions.drawing_utils
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
 model_selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation()
+mp_face_mesh=mp.solutions.face_mesh
+
+model_face_mesh=mp_face_mesh.FaceMesh()
 
 st.title("OpenCV")
 st.subheader("Image Operations")
@@ -15,7 +18,7 @@ st.write("Created by vishwajeet jagtap")
 
 add_selectbox = st.sidebar.selectbox(
     "What operations would u like to perform",
-    ("About","Change color","image blend","Selfie segmentation")
+    ("About","Change color","image blend","Selfie segmentation","Face mesh")
 )
 if add_selectbox=="About":
     st.write("this app is for demo purpose")
@@ -80,6 +83,14 @@ elif add_selectbox=="Selfie segmentation":
         bg_image[:] = BG_COLOR
         output_image = np.where(condition1, image, image2)
         st.image(output_image)
+elif add_selectbox=="Face mesh":
+    st.write("Face mesh")
+    image_file_path=st.sidebar.file_uploader("upload image")
+    if image_file_path is not None:
+        image=(np.array(Image.open(image_file_path)))
+        st.sidebar.image(image)
+        results=model_face_mesh.process(image) 
 
-    
-    
+        for face_landmarks in results.multi_face_landmarks:
+            mp_drawing.draw_landmarks(image,face_landmarks)
+        st.image(image)   
