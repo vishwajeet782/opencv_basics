@@ -102,7 +102,7 @@ elif add_selectbox=="Yellow":
         image=np.array(Image.open(image_file_path))
         zeros=np.zeros(image.shape[:2],dtype="uint8")
         b,g,r=cv2.split(image)
-        yellow_image=cv2.merge([r,g,zeros])
+        yellow_image=cv2.merge([r,g,b])
         st.image(yellow_image)
     
         
