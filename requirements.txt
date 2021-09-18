@@ -2,4 +2,4 @@ streamlit
 opencv-contrib-python
 mediapipe
 opencv-python-headless
-streamlit-webrtc
+streamlit-webrtc==0.28.1
