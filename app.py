@@ -3,10 +3,13 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 import mediapipe as mp
+from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
 mp_drawing = mp.solutions.drawing_utils
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
 model_selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation()
 mp_face_mesh=mp.solutions.face_mesh
+mp_face_detection=mp.solutions.face_detection
+model_detection=mp_face_detection.FaceDetection()
 
 model_face_mesh=mp_face_mesh.FaceMesh()
 
@@ -18,7 +21,7 @@ st.write("Created by vishwajeet jagtap")
 
 add_selectbox = st.sidebar.selectbox(
     "What operations would u like to perform",
-    ("About","Change color","image blend","Selfie segmentation","Face mesh","Yellow")
+    ("About","Change color","image blend","Selfie segmentation","Face mesh","Face Detection")
 )
 if add_selectbox=="About":
     st.write("this app is for demo purpose")
@@ -94,16 +97,21 @@ elif add_selectbox=="Face mesh":
         for face_landmarks in results.multi_face_landmarks:
             mp_drawing.draw_landmarks(image,face_landmarks)
         st.image(image)
-elif add_selectbox=="Yellow":
+elif add_selectbox=="Face Detection":
+    st.write("Detecting face")
 
-    st.write("Converting to yellow")
-    image_file_path=st.sidebar.file_uploader("upload image")
-    if image_file_path is not None:
-        image=np.array(Image.open(image_file_path))
-        zeros=np.zeros(image.shape[:2],dtype="uint8")
-        b,g,r=cv2.split(image)
-        yellow_image=cv2.merge([r,g,b])
-        st.image(yellow_image)
+    class VideoTransformer(VideoTransformerBase):
+        def transform(self, frame):
+            img = frame.to_ndarray(format="bgr24")
+            results=model_detection.process(img)
+            for landmarks in results.detections:
+                mp_drawing.draw_detection(img,landmarks)
+
+
+            return img
+
+
+    webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
     
         
     
