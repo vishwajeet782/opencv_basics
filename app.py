@@ -18,7 +18,7 @@ st.write("Created by vishwajeet jagtap")
 
 add_selectbox = st.sidebar.selectbox(
     "What operations would u like to perform",
-    ("About","Change color","image blend","Selfie segmentation","Face mesh")
+    ("About","Change color","image blend","Selfie segmentation","Face mesh","Yellow")
 )
 if add_selectbox=="About":
     st.write("this app is for demo purpose")
@@ -93,4 +93,18 @@ elif add_selectbox=="Face mesh":
 
         for face_landmarks in results.multi_face_landmarks:
             mp_drawing.draw_landmarks(image,face_landmarks)
-        st.image(image)   
+        st.image(image)
+elif add_selectbox=="Yellow":
+
+    st.write("Converting to yellow")
+    image_file_path=st.sidebar.file_uploader("upload image")
+    if image_file_path is not None:
+        image=np.array(Image.open(image_file_path))
+        zeros=np.zeros(image.shape[:2],dtype="uint8")
+        b,g,r=cv2.split(image)
+        yellow_image=cv2.merge([r,g,zeros])
+        st.image(yellow_image)
+    
+        
+    
+    
