@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import mediapipe as mp
 from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
+
 mp_drawing = mp.solutions.drawing_utils
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
 model_selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation()
@@ -112,13 +113,16 @@ elif add_selectbox=="Face Detection":
             )
 
             return img
+            
 
 
     ctx = webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
-
-    if ctx.video_transformer:
-        ctx.video_transformer.threshold1 = st.slider("Threshold1", 0, 1000, 100)
-        ctx.video_transformer.threshold2 = st.slider("Threshold2", 0, 1000, 200)
+    while True:
+        if ctx.video_transformer:
+            result = ctx.video_transformer.result_queue.get()
+        
+            ctx.video_transformer.threshold1 = st.slider("Threshold1", 0, 1000, 100)
+            ctx.video_transformer.threshold2 = st.slider("Threshold2", 0, 1000, 200)
     
         
     
