@@ -4,6 +4,19 @@ import numpy as np
 from PIL import Image
 import mediapipe as mp
 from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
+import enum
+from aiortc import RTCPeerConnection, RTCSessionDescription
+from aiortc.contrib.media import MediaRelay
+from aiortc.mediastreams import MediaStreamTrack
+RTC_CONFIGURATION = RTCConfiguration(
+    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+)
+
+
+class WebRtcMode(enum.Enum):
+    RECVONLY = enum.auto()
+    SENDONLY = enum.auto()
+    SENDRECV = enum.auto()
 
 mp_drawing = mp.solutions.drawing_utils
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
@@ -99,31 +112,17 @@ elif add_selectbox=="Face mesh":
             mp_drawing.draw_landmarks(image,face_landmarks)
         st.image(image)
 elif add_selectbox=="Face Detection":
-
-    class VideoTransformer(VideoTransformerBase):
-        def __init__(self):
-            self.threshold1 = 100
-            self.threshold2 = 200
-
-        def transform(self, frame):
-            img = frame.to_ndarray(format="bgr24")
-
-            img = cv2.cvtColor(
-            cv2.Canny(img, self.threshold1, self.threshold2), cv2.COLOR_GRAY2BGR
-            )
-
-            return img
-            
-
-
-    ctx = webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
     
-    if ctx.video_transformer:
-        result = ctx.video_transformer.result_queue.get()
-        
-        ctx.video_transformer.threshold1 = st.slider("Threshold1", 0, 1000, 100)
-        ctx.video_transformer.threshold2 = st.slider("Threshold2", 0, 1000, 200)
+    def app_programatically_play():
     
+        playing = st.checkbox("Playing", value=True)
+
+        webrtc_streamer(
+        key="media-constraints",
+        desired_playing_state=playing,
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration=RTC_CONFIGURATION,)
+
         
     
     
