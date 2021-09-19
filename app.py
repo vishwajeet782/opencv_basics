@@ -117,12 +117,12 @@ elif add_selectbox=="Face Detection":
 
 
     ctx = webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
-    while True:
-        if ctx.video_transformer:
-            result = ctx.video_transformer.result_queue.get()
+    
+    if ctx.video_transformer:
+        result = ctx.video_transformer.result_queue.get()
         
-            ctx.video_transformer.threshold1 = st.slider("Threshold1", 0, 1000, 100)
-            ctx.video_transformer.threshold2 = st.slider("Threshold2", 0, 1000, 200)
+        ctx.video_transformer.threshold1 = st.slider("Threshold1", 0, 1000, 100)
+        ctx.video_transformer.threshold2 = st.slider("Threshold2", 0, 1000, 200)
     
         
     
