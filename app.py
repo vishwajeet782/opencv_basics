@@ -5,11 +5,14 @@ from PIL import Image
 import mediapipe as mp
 from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
 import enum
-from aiortc import RTCPeerConnection, RTCSessionDescription
-from aiortc.contrib.media import MediaRelay
-from aiortc.mediastreams import MediaStreamTrack
-RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+from streamlit_webrtc import (
+    AudioProcessorBase,
+    RTCConfiguration,
+    VideoProcessorBase,
+    WebRtcMode,
+    webrtc_streamer,
+)
+RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
 )
 
 
@@ -112,16 +115,15 @@ elif add_selectbox=="Face mesh":
             mp_drawing.draw_landmarks(image,face_landmarks)
         st.image(image)
 elif add_selectbox=="Face Detection":
+    class OpenCVVideoProcessor(VideoProcessorBase):
     
-    def app_programatically_play():
+        def transform(self, frame):
+            img = frame.to_ndarray(format="bgr24")
+            return img
     
-        playing = st.checkbox("Playing", value=True)
+            
 
-        webrtc_streamer(
-        key="media-constraints",
-        desired_playing_state=playing,
-        mode=WebRtcMode.SENDRECV,
-        rtc_configuration=RTC_CONFIGURATION,)
+    webrtc_streamer(key="example",mode=WebRtcMode.SENDRECV,rtc_configuration=RTC_CONFIGURATION)
 
         
     
