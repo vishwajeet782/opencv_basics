@@ -137,8 +137,8 @@ elif add_selectbox=="Face Detection":
             
     webrtc_ctx = webrtc_streamer(
         key="opencv-filter",
-        mode=WebRtcMode.SENDRECV,
-        # rtc_configuration=RTC_CONFIGURATION,
+        # mode=WebRtcMode.SENDRECV,
+        rtc_configuration=RTC_CONFIGURATION,
         video_processor_factory=OpenCVVideoProcessor,
        
     )
