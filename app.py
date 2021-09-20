@@ -2,6 +2,12 @@ import cv2
 import streamlit as st
 import numpy as np
 from PIL import Image
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal 
+import av
+import logging
 import mediapipe as mp
 from streamlit_webrtc import VideoTransformerBase, webrtc_streamer
 import enum
@@ -12,6 +18,7 @@ from streamlit_webrtc import (
     WebRtcMode,
     webrtc_streamer,
 )
+logger = logging.getLogger(__name__)
 RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
 )
 
@@ -21,6 +28,7 @@ class WebRtcMode(enum.Enum):
     SENDONLY = enum.auto()
     SENDRECV = enum.auto()
 
+
 mp_drawing = mp.solutions.drawing_utils
 mp_selfie_segmentation = mp.solutions.selfie_segmentation
 model_selfie_segmentation = mp_selfie_segmentation.SelfieSegmentation()
@@ -29,6 +37,8 @@ mp_face_detection=mp.solutions.face_detection
 model_detection=mp_face_detection.FaceDetection()
 
 model_face_mesh=mp_face_mesh.FaceMesh()
+
+
 
 st.title("OpenCV")
 st.subheader("Image Operations")
@@ -116,14 +126,25 @@ elif add_selectbox=="Face mesh":
         st.image(image)
 elif add_selectbox=="Face Detection":
     class OpenCVVideoProcessor(VideoProcessorBase):
-    
-        def transform(self, frame):
+        
+        
+        def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
             img = frame.to_ndarray(format="bgr24")
-            return img
+            
+            return av.VideoFrame.from_ndarray(img, format="bgr24")
+            # return av.VideoFrame.from_ndarray(img, format="bgr24")
     
             
+    webrtc_ctx = webrtc_streamer(
+        key="opencv-filter",
+        mode=WebRtcMode.SENDRECV,
+        # rtc_configuration=RTC_CONFIGURATION,
+        video_processor_factory=OpenCVVideoProcessor,
+       
+    )
 
-    webrtc_streamer(key="example",mode=WebRtcMode.SENDRECV,rtc_configuration=RTC_CONFIGURATION)
+
+   
 
         
     
