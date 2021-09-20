@@ -130,6 +130,9 @@ elif add_selectbox=="Face Detection":
         
         def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
             img = frame.to_ndarray(format="bgr24")
+            results=model_detection.process(img)
+            for landmarks in results.detections:
+                mp_drawing.draw_detection(img,landmarks)
             
             return av.VideoFrame.from_ndarray(img, format="bgr24")
             # return av.VideoFrame.from_ndarray(img, format="bgr24")
