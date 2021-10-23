@@ -40,6 +40,7 @@ model_face_mesh=mp_face_mesh.FaceMesh()
 
 
 
+
 st.title("OpenCV")
 st.subheader("Image Operations")
 st.write("various operations with opencv")
@@ -48,7 +49,7 @@ st.write("Created by vishwajeet jagtap")
 
 add_selectbox = st.sidebar.selectbox(
     "What operations would u like to perform",
-    ("About","Change color","image blend","Selfie segmentation","Face mesh","Face Detection")
+    ("About","Change color","image blend","Selfie segmentation","Face mesh","Face Detection","Video segmentation")
 )
 if add_selectbox=="About":
     st.write("this app is for demo purpose")
@@ -147,6 +148,45 @@ elif add_selectbox=="Face Detection":
         video_processor_factory=OpenCVVideoProcessor,
        
     )
+
+elif add_selectbox=="Video segmentation":
+    
+    image_file_path=st.sidebar.file_uploader("upload image")
+    if image_file_path is not None:
+        
+    
+        class OpenCVVideoProcessor(VideoProcessorBase):
+        
+            def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+                bg_image=np.array(Image.open(image_file_path))
+                bg_image=cv2.cvtColor(bg_image,cv2.COLOR_BGR2RGB)
+                
+            
+                img = frame.to_ndarray(format="bgr24")
+                results=model_selfie_segmentation.process(img)
+            
+                condition = np.stack((results.segmentation_mask,) * 3, axis=-1) > 0.1
+            
+                if bg_image is None:
+                    BG_COLOR=(192,192,192)
+                    bg_image = np.zeros(img.shape, dtype=np.uint8)
+                    bg_image[:] = BG_COLOR
+                    print(bg_image)
+                bg_image=cv2.resize(bg_image,((img.shape[1]),(img.shape[0])))
+                output_image = np.where(condition, img, bg_image)
+
+                return av.VideoFrame.from_ndarray(output_image, format="bgr24")
+        webrtc_ctx = webrtc_streamer(
+        key="opencv-filter2",
+        # mode=WebRtcMode.SENDRECV,
+        rtc_configuration=RTC_CONFIGURATION,
+        video_processor_factory=OpenCVVideoProcessor,
+       
+    )
+
+
+
+            
 
 
    
